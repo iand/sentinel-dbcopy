@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 
-from shared import tables
+from helpers import tables
 
 
 def import_table(connect_str, table_name, columns):

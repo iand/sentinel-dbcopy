@@ -1,5 +1,8 @@
-FROM ubuntu:20.04
+FROM filecoin/sentinel-visor:master-93f752ef
 
-RUN apt update && apt install -y postgresql-client python3 python-is-python3
+RUN apt update && apt install -y postgresql-client python3 python3-pip
+RUN pip3 install pendulum
 
-ADD import-backfill.py shared.py backfill-table.py ./
+ADD *.py ./
+
+ENTRYPOINT []

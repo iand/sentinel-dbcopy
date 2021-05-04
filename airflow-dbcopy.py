@@ -5,14 +5,14 @@ import subprocess
 import sys
 import time
 
-from helpers import now, tables
+from helpers import get_output_folder, tables
 
 
 def import_table(connect_str, table_name, columns):
     filename = f"{table_name}.csv"
     if not os.path.isfile(filename):
+        # raise Exception(f"Could not find {filename} in {os.getcwd()}")
         print(f"Could not find {filename} in {os.getcwd()}")
-        # sys.exit(1)
     tmp_table_name = f"backfill_temp_{table_name}"
     # Split into multiple commands because psql requires \copy to be a separate command
     command1 = f"""BEGIN TRANSACTION;CREATE TEMP TABLE {tmp_table_name} ON COMMIT DROP AS SELECT * FROM public.{table_name} WITH NO DATA;"""
@@ -44,11 +44,25 @@ def import_table(connect_str, table_name, columns):
         print("❌")
         print(process.stderr)
         print(process.stdout)
+        raise Exception(f"Could not import {table_name}")
 
 
 if __name__ == "__main__":
+    failed = False
     connect_str = os.environ["DATABASE_URL"]
-    csv_path = os.environ["CSV_PATH"]
+    csv_path = get_output_folder()
+    print(f"Running in {csv_path}")
     os.chdir(csv_path)
+    if not os.path.isfile("visor_processing_reports.csv"):
+        print("Could not find visor_processing_reports")
+        # We should do more than just check it exists, it needs to have entries for each task/epoc
+        sys.exit(1)
     for name in tables:
-        import_table(connect_str, name, tables[name])
+        try:
+            import_table(connect_str, name, tables[name])
+        except Exception as err:
+            print(err)
+            failed = True
+    if failed:
+        print("Failed!")
+        sys.exit(1)

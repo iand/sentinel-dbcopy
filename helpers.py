@@ -1,8 +1,40 @@
+import os
 import time
 
 
 def now():
     return time.perf_counter()
+
+
+import pendulum
+from pendulum._extensions.helpers import timestamp
+
+
+def epoc_to_date(epoc):
+    timestamp = 1598306400 + 30 * int(epoc)
+    return pendulum.from_timestamp(timestamp)
+
+
+def date_to_epoc(date):
+    timestamp = date.int_timestamp
+    epoc = (timestamp - 1598306400) / 30
+    assert epoc.is_integer()
+    return int(epoc)
+
+
+def get_output_folder():
+    AIRFLOW_TS = os.environ["AIRFLOW_TS"]
+    JOB_NAME = os.environ["JOB_NAME"]
+    execution_time = pendulum.parse(AIRFLOW_TS)
+    start_time = execution_time.subtract(hours=9)
+    end_time = execution_time.subtract(hours=8)
+    start_epoc = date_to_epoc(start_time)
+    end_epoc = date_to_epoc(end_time)
+
+    print(execution_time)
+    print(f"from {start_epoc} to {end_epoc}, total: {end_epoc-start_epoc}")
+
+    return f"/output/{JOB_NAME}/{start_epoc}__{end_epoc}"
 
 
 tables = {
@@ -35,5 +67,5 @@ tables = {
     "parsed_messages": 'height,cid,"from","to",value,method,params',
     "power_actor_claims": "height,miner_id,state_root,raw_byte_power,quality_adj_power",
     "receipts": "height,message,state_root,idx,exit_code,gas_used",
-    'visor_processing_reports'     : 'height,state_root,reporter,task,started_at,completed_at,status,status_information,errors_detected'
+    "visor_processing_reports": "height,state_root,reporter,task,started_at,completed_at,status,status_information,errors_detected",
 }
