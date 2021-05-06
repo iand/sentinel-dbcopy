@@ -1,4 +1,4 @@
-FROM filecoin/sentinel-visor:master-93f752ef
+FROM filecoin/sentinel-visor:master-6f9f9998
 
 RUN apt update && apt install -y postgresql-client python3 python3-pip
 RUN pip3 install pendulum
