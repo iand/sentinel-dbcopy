@@ -1,5 +1,10 @@
 import os
 import time
+import socket
+from contextlib import closing
+
+AIRFLOW_TS = os.environ["AIRFLOW_TS"]
+JOB_NAME = os.environ["JOB_NAME"]
 
 
 def now():
@@ -8,6 +13,18 @@ def now():
 
 import pendulum
 from pendulum._extensions.helpers import timestamp
+
+
+def find_free_port():
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(("", 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
+
+
+def set_prometheus_env():
+    free_port = find_free_port()
+    os.environ["VISOR_PROMETHEUS_PORT"] = f":{free_port}"
 
 
 def epoc_to_date(epoc):
@@ -22,16 +39,17 @@ def date_to_epoc(date):
     return int(epoc)
 
 
-def get_output_folder():
-    AIRFLOW_TS = os.environ["AIRFLOW_TS"]
-    JOB_NAME = os.environ["JOB_NAME"]
+def get_start_end_epocs():
     execution_time = pendulum.parse(AIRFLOW_TS)
     start_time = execution_time.subtract(hours=9)
     end_time = execution_time.subtract(hours=8)
     start_epoc = date_to_epoc(start_time)
     end_epoc = date_to_epoc(end_time)
+    return start_epoc, end_epoc
 
-    print(execution_time)
+
+def get_output_folder():
+    start_epoc, end_epoc = get_start_end_epocs()
     print(f"from {start_epoc} to {end_epoc}, total: {end_epoc-start_epoc}")
 
     return f"/output/{JOB_NAME}/{start_epoc}__{end_epoc}"
