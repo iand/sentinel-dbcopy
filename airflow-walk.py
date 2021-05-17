@@ -5,7 +5,23 @@ from helpers import get_start_end_epocs, set_prometheus_env, get_output_folder
 from pathlib import Path
 
 
+def get_repo_for(epoc):
+    repos = [471050, 505660, 544858, 598300, 745340, 764950]
+    for repo_epoc in repos:
+        if repo_epoc > epoc:
+            return f"s3://sentinel-backfill/repo/mainnet/{repo_epoc}"
+
+
 set_prometheus_env()
+
+start_epoc, end_epoc = get_start_end_epocs()
+
+if os.getenv("VISOR_LENS") == "lotusrepo":
+    s3_repo_path = get_repo_for(end_epoc)
+    subprocess.run("rm -rf /repo/*", shell=True, check=True)
+    subprocess.run(
+        f"s5cmd cp --if-size-differ '{s3_repo_path}/*' /repo/", shell=True, check=True
+    )
 
 
 CSV_PATH = get_output_folder()
@@ -13,7 +29,6 @@ Path(CSV_PATH).mkdir(parents=True, exist_ok=True)
 for csv_path in Path(CSV_PATH).glob("*.csv"):
     csv_path.unlink()
 
-start_epoc, end_epoc = get_start_end_epocs()
 
 command = f"/usr/bin/visor run walk --db '' --from {start_epoc} --to {end_epoc} --csv {CSV_PATH}"
 

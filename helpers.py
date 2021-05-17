@@ -3,9 +3,6 @@ import time
 import socket
 from contextlib import closing
 
-AIRFLOW_TS = os.environ["AIRFLOW_TS"]
-JOB_NAME = os.environ["JOB_NAME"]
-
 
 def now():
     return time.perf_counter()
@@ -40,19 +37,26 @@ def date_to_epoc(date):
 
 
 def get_start_end_epocs():
-    execution_time = pendulum.parse(AIRFLOW_TS)
-    start_time = execution_time.subtract(hours=9)
-    end_time = execution_time.subtract(hours=8)
+    airflow_ts = os.environ["AIRFLOW_TS"]
+    execution_time = pendulum.parse(airflow_ts)
+
+    if os.getenv("AIRFLOW_INTERVAL") == "DAILY":
+        end_time = execution_time.start_of("day")
+        start_time = end_time.subtract(days=1)
+    else:
+        start_time = execution_time.subtract(hours=9)
+        end_time = execution_time.subtract(hours=8)
+
     start_epoc = date_to_epoc(start_time)
     end_epoc = date_to_epoc(end_time)
     return start_epoc, end_epoc
 
 
 def get_output_folder():
+    job_name = os.environ["JOB_NAME"]
     start_epoc, end_epoc = get_start_end_epocs()
     print(f"from {start_epoc} to {end_epoc}, total: {end_epoc-start_epoc}")
-
-    return f"/output/{JOB_NAME}/{start_epoc}__{end_epoc}"
+    return f"/output/{job_name}/{start_epoc}__{end_epoc}"
 
 
 tables = {
