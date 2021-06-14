@@ -7,7 +7,5 @@ RUN wget -O - https://github.com/peak/s5cmd/releases/download/v1.2.1/s5cmd_1.2.1
 
 ADD *.py ./
 
-ADD run_backfill.sh .
-RUN chmod a+x run_backfill.sh
 
 ENTRYPOINT []
