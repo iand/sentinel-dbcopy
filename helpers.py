@@ -41,7 +41,7 @@ def get_start_end_epocs():
     execution_time = pendulum.parse(airflow_ts)
 
     if os.getenv("AIRFLOW_INTERVAL") == "DAILY":
-        end_time = execution_time.start_of("day")
+        end_time = execution_time.end_of("day")
         start_time = end_time.subtract(days=1)
     else:
         start_time = execution_time.subtract(hours=9)
