@@ -5,20 +5,32 @@ import subprocess
 import sys
 import time
 
-from helpers import get_output_folder, tables
+from helpers import get_output_folder, tables, v1_tables
 
 
-def import_table(connect_str, table_name, columns):
-    filename = f"{table_name}.csv"
-    if not os.path.isfile(filename):
+def import_table(connect_str, table_name):
+    v1_filename = f"{table_name}.csv"
+    v0_filename = f"{table_name}.v0.csv"
+    v0_columns = tables[table_name]
+    if table_name in v1_tables:
+        csv_cut_comand = (
+            f"/usr/bin/csvcut -c {v0_columns} {v1_filename} > {v0_filename}"
+        )
+        print(csv_cut_comand, flush=True)
+        subprocess.run(csv_cut_comand, shell=True, check=True)
+        import_filename = v0_filename
+    else:
+        import_filename = v1_filename
+
+    if not os.path.isfile(v1_filename):
         # raise Exception(f"Could not find {filename} in {os.getcwd()}")
-        print(f"Could not find {filename} in {os.getcwd()}")
+        print(f"Could not find {v1_filename} in {os.getcwd()}")
     tmp_table_name = f"backfill_temp_{table_name}"
     # Split into multiple commands because psql requires \copy to be a separate command
     command1 = f"""BEGIN TRANSACTION;CREATE TEMP TABLE {tmp_table_name} ON COMMIT DROP AS SELECT * FROM public.{table_name} WITH NO DATA;"""
-    command2 = f"""\\copy {tmp_table_name}({columns}) FROM '{filename}' DELIMITER ',' CSV HEADER;"""
+    command2 = f"""\\copy {tmp_table_name}({v0_columns}) FROM '{import_filename}' DELIMITER ',' CSV HEADER;"""
     command3 = f"""INSERT INTO public.{table_name} SELECT * FROM {tmp_table_name} ON CONFLICT DO NOTHING;COMMIT;"""
-    print(f"Loading {table_name}", end=" ")
+    print(f"Loading {table_name} from {import_filename}", end=" ", flush=True)
     process = subprocess.run(
         [
             "psql",
@@ -39,11 +51,11 @@ def import_table(connect_str, table_name, columns):
         text=True,
     )
     if process.returncode == 0:
-        print("✓")
+        print("✓", flush=True)
     else:
         print("❌")
         print(process.stderr)
-        print(process.stdout)
+        print(process.stdout, flush=True)
         raise Exception(f"Could not import {table_name}")
 
 
@@ -59,7 +71,7 @@ if __name__ == "__main__":
         sys.exit(1)
     for name in tables:
         try:
-            import_table(connect_str, name, tables[name])
+            import_table(connect_str, name)
         except Exception as err:
             print(err)
             failed = True

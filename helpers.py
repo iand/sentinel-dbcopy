@@ -91,3 +91,10 @@ tables = {
     "receipts": "height,message,state_root,idx,exit_code,gas_used",
     "visor_processing_reports": "height,state_root,reporter,task,started_at,completed_at,status,status_information,errors_detected",
 }
+
+v1_tables = {
+    "chain_economics": "height,parent_state_root,circulating_fil,vested_fil,mined_fil,burnt_fil,locked_fil,fil_reserve_disbursed",
+    "derived_gas_outputs": 'height,cid,state_root,"from","to",value,gas_fee_cap,gas_premium,gas_limit,size_bytes,nonce,method,actor_name,actor_family,exit_code,gas_used,parent_base_fee,base_fee_burn,over_estimation_burn,miner_penalty,miner_tip,refund,gas_refund,gas_burned',
+    "id_addresses": "height,id,address,state_root",
+    "miner_infos": "height,miner_id,state_root,owner_id,worker_id,new_worker,worker_change_epoch,consensus_faulted_elapsed,peer_id,control_addresses,multi_addresses,sector_size",
+}
