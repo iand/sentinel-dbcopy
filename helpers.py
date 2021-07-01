@@ -1,7 +1,12 @@
 import os
 import time
 import socket
+import paramiko
+import subprocess
+
 from contextlib import closing
+
+from pathlib import Path
 
 
 def now():
@@ -10,6 +15,47 @@ def now():
 
 import pendulum
 from pendulum._extensions.helpers import timestamp
+
+
+ssh_key_folder = Path.home() / ".ssh"
+ssh_key_path = ssh_key_folder / "id_ed25519_snapreader"
+ssh_user = "snapreader"
+ssh_host = "172.31.42.56"
+
+
+def get_snapshot_folder():
+    sftp = get_sftp_client()
+    folders = sftp.listdir("snapshots")
+    folder = sorted(folders)[-1]
+    return folder
+
+
+def setup_ssh():
+    ssh_key_folder.mkdir()
+    with ssh_key_path.open("w") as ssh_key_file:
+        ssh_key_file.write(os.environ["SYNC_SSH_KEY"])
+
+
+def setup_rclone():
+    setup_ssh()
+    subprocess.run(
+        f"rclone config create sftp sftp host {ssh_host} user {ssh_user} key_file {ssh_key_path}",
+        shell=True,
+        check=True,
+    )
+    subprocess.run(
+        f"rclone config create s3 s3 type s3 provider AWS env_auth true region us-east-2",
+        shell=True,
+        check=True,
+    )
+
+
+def get_sftp_client():
+    setup_ssh()
+    pk = paramiko.Ed25519Key.from_private_key_file(ssh_key_path)
+    transport = paramiko.Transport(ssh_host)
+    transport.connect(username=ssh_user, pkey=pk)
+    return paramiko.SFTPClient.from_transport(transport)
 
 
 def find_free_port():

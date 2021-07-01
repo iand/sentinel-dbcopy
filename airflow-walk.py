@@ -2,7 +2,14 @@ import pendulum
 import subprocess
 import paramiko
 import os
-from helpers import get_start_end_epocs, set_prometheus_env, get_output_folder
+from helpers import (
+    get_start_end_epocs,
+    set_prometheus_env,
+    get_output_folder,
+    setup_rclone,
+    get_snapshot_folder,
+    setup_rclone,
+)
 from pathlib import Path
 
 
@@ -25,24 +32,8 @@ if os.getenv("VISOR_LENS") == "lotusrepo":
         subprocess.run("rm -rf /repo/*", shell=True, check=True)
         command = f"s5cmd cp --if-size-differ '{s3_repo_path}/*' /repo/"
     else:
-        ssh_key_folder = Path.home() / ".ssh"
-        ssh_key_folder.mkdir()
-        ssh_key_path = ssh_key_folder / "id_ed25519_snapreader"
-        with ssh_key_path.open("w") as ssh_key_file:
-            ssh_key_file.write(os.environ["SYNC_SSH_KEY"])
-        pk = paramiko.Ed25519Key.from_private_key_file(ssh_key_path)
-        host = "172.31.42.56"
-        username = "snapreader"
-        transport = paramiko.Transport(host)
-        transport.connect(username=username, pkey=pk)
-        sftp = paramiko.SFTPClient.from_transport(transport)
-        folders = sftp.listdir("snapshots")
-        folder = sorted(folders)[-1]
-        subprocess.run(
-            f"rclone config create sftp sftp host {host} user {username} key_file {ssh_key_path}",
-            shell=True,
-            check=True,
-        )
+        folder = get_snapshot_folder()
+        setup_rclone()
         subprocess.run("rm -rf /repo/*", shell=True, check=True)
         print(f"Fetching from sftp:snapshots/{folder}")
         command = f"rclone copy sftp:snapshots/{folder}/lotus_datadir /repo"
