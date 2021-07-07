@@ -31,7 +31,7 @@ def get_snapshot_folder():
 
 
 def setup_ssh():
-    ssh_key_folder.mkdir()
+    ssh_key_folder.mkdir(exist_ok=True)
     with ssh_key_path.open("w") as ssh_key_file:
         ssh_key_file.write(os.environ["SYNC_SSH_KEY"])
 
