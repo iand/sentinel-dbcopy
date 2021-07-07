@@ -100,9 +100,10 @@ def get_start_end_epocs():
 
 def get_output_folder():
     job_name = os.environ["JOB_NAME"]
+    csv_base_path = os.getenv("CSV_BASE_PATH", "/output")
     start_epoc, end_epoc = get_start_end_epocs()
     print(f"from {start_epoc} to {end_epoc}, total: {end_epoc-start_epoc}")
-    return f"/output/{job_name}/{start_epoc}__{end_epoc}"
+    return f"{csv_base_path}/{job_name}/{start_epoc}__{end_epoc}"
 
 
 tables = {
@@ -144,3 +145,61 @@ v1_tables = {
     "id_addresses": "height,id,address,state_root",
     "miner_infos": "height,miner_id,state_root,owner_id,worker_id,new_worker,worker_change_epoch,consensus_faulted_elapsed,peer_id,control_addresses,multi_addresses,sector_size",
 }
+
+
+def import_table(connect_str, table_name):
+    v1_filename = f"{table_name}.csv"
+    v0_filename = f"{table_name}.v0.csv"
+    v0_columns = tables[table_name]
+    v1_columns = tables[table_name]
+    if table_name in v1_tables:
+        v1_columns = v1_tables[table_name]
+        csv_cut_comand = (
+            f"/usr/bin/csvcut -c {v0_columns} {v1_filename} > {v0_filename}"
+        )
+        print(csv_cut_comand, flush=True)
+        subprocess.run(csv_cut_comand, shell=True, check=True)
+
+    if os.getenv("VISOR_SCHEMA_VERSION") == "v0":
+        import_filename = v0_filename
+        columns = v0_columns
+    else:
+        import_filename = v1_filename
+        columns = v1_columns
+
+    visor_database_schema = os.getenv("VISOR_DATABASE_SCHEMA", "visor")
+    if not os.path.isfile(import_filename):
+        # raise Exception(f"Could not find {filename} in {os.getcwd()}")
+        print(f"Could not find {import_filename} in {os.getcwd()}")
+    tmp_table_name = f"backfill_temp_{table_name}"
+    # Split into multiple commands because psql requires \copy to be a separate command
+    command1 = f"""BEGIN TRANSACTION;CREATE TEMP TABLE {tmp_table_name} ON COMMIT DROP AS SELECT * FROM {visor_database_schema}.{table_name} WITH NO DATA;"""
+    command2 = f"""\\copy {tmp_table_name}({columns}) FROM '{import_filename}' DELIMITER ',' CSV HEADER;"""
+    command3 = f"""INSERT INTO {visor_database_schema}.{table_name} SELECT * FROM {tmp_table_name} ON CONFLICT DO NOTHING;COMMIT;"""
+    print(f"Loading {table_name} from {import_filename}", end=" ", flush=True)
+    process = subprocess.run(
+        [
+            "psql",
+            "-q",
+            "-a",
+            "-X",
+            "-t",
+            "-d",
+            connect_str,
+            "-c",
+            command1,
+            "-c",
+            command2,
+            "-c",
+            command3,
+        ],
+        capture_output=True,
+        text=True,
+    )
+    if process.returncode == 0:
+        print("✓", flush=True)
+    else:
+        print("❌")
+        print(process.stderr)
+        print(process.stdout, flush=True)
+        raise Exception(f"Could not import {table_name}")
