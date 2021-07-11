@@ -1,4 +1,4 @@
-FROM filecoin/sentinel-visor:v0.7.1
+FROM filecoin/sentinel-visor:v0.7.2
 
 RUN apt update && apt install -y postgresql-client python3 python3-pip unzip csvkit
 RUN pip3 install pendulum paramiko
