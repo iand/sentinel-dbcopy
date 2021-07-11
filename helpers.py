@@ -82,10 +82,13 @@ def date_to_epoc(date):
     return int(epoc)
 
 
-def get_start_end_epocs():
+def get_execution_time():
     airflow_ts = os.environ["AIRFLOW_TS"]
-    execution_time = pendulum.parse(airflow_ts)
+    return pendulum.parse(airflow_ts)
 
+
+def get_start_end_epocs():
+    execution_time = get_execution_time()
     if os.getenv("AIRFLOW_INTERVAL") == "DAILY":
         start_time = execution_time.start_of("day")
         end_time = start_time.add(days=1)
@@ -96,6 +99,11 @@ def get_start_end_epocs():
     start_epoc = date_to_epoc(start_time)
     end_epoc = date_to_epoc(end_time)
     return start_epoc, end_epoc
+
+
+def get_dt():
+    execution_time = get_execution_time()
+    return execution_time.format("YYYY-MM-DD")
 
 
 def get_output_folder():
