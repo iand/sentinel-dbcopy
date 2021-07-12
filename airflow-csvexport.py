@@ -6,7 +6,7 @@ from dask.distributed import Client
 from helpers import get_dt, get_output_folder, get_start_end_epocs
 import yaml
 
-client = Client(memory_limit="8GB", processes=False)
+client = Client(memory_limit="7GB", processes=False)
 
 file_path = pathlib.Path(__file__).parent.absolute()
 with open(file_path / "schema.yaml") as f:
@@ -16,7 +16,7 @@ with open(file_path / "schema.yaml") as f:
 def df_for_table(table_name):
     start_height, stop_height = get_start_end_epocs()
     csv_path = f"{table_name}.csv"
-    df = dd.read_csv(csv_path, dtype=str)
+    df = dd.read_csv(csv_path, dtype=str, blocksize="512MB")
     if "height" in schema[table_name]["columns"]:
         df["height"] = df["height"].astype(int)
         df = df.query(f"{start_height} <= height < {stop_height}").drop_duplicates(
