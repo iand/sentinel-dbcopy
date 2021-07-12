@@ -47,3 +47,4 @@ if __name__ == "__main__":
         compression="gzip",
         single_file=True,
     )
+    print(f"DONE", flush=True)
