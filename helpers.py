@@ -110,7 +110,6 @@ def get_output_folder():
     job_name = os.environ["JOB_NAME"]
     csv_base_path = os.getenv("CSV_BASE_PATH", "/output")
     start_epoc, end_epoc = get_start_end_epocs()
-    print(f"from {start_epoc} to {end_epoc}, total: {end_epoc-start_epoc}")
     return f"{csv_base_path}/{job_name}/{start_epoc}__{end_epoc}"
 
 
@@ -153,6 +152,12 @@ v1_tables = {
     "id_addresses": "height,id,address,state_root",
     "miner_infos": "height,miner_id,state_root,owner_id,worker_id,new_worker,worker_change_epoch,consensus_faulted_elapsed,peer_id,control_addresses,multi_addresses,sector_size",
 }
+
+
+def get_export_filename(table_name):
+    csv_base_path = os.getenv("CSV_BASE_PATH", "/output")
+    dt = get_dt()
+    return f"{csv_base_path}/export/{table_name}/{dt}.csv.gz"
 
 
 def import_table(connect_str, table_name):
