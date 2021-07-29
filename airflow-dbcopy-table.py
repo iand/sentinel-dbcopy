@@ -69,7 +69,7 @@ def import_table(connect_str, table_name):
 
 if __name__ == "__main__":
     connect_str = os.environ["DATABASE_URL"]
-    table_name = os.environ["SENTINEL_DBIMPORT_TABLENAME"]
+    table_name = os.environ["SENTINEL_AIRFLOW_TABLENAME"]
     csv_path = get_output_folder()
     print(f"Running in {csv_path}")
     os.chdir(csv_path)

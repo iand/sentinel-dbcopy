@@ -11,7 +11,7 @@ with open(file_path / "schema.yaml") as f:
 
 
 if __name__ == "__main__":
-    table_name = os.environ["SENTINEL_DBIMPORT_TABLENAME"]
+    table_name = os.environ["SENTINEL_AIRFLOW_TABLENAME"]
     csv_path = get_output_folder()
     print(f"Running in {csv_path}", flush=True)
     os.chdir(csv_path)
