@@ -431,9 +431,9 @@ market_deal_proposals:
     provider_id:
       data_type: text
       is_nullable: 'NO'
-    slashed_epoch:
-      data_type: bigint
-      is_nullable: 'YES'
+    # slashed_epoch:
+    #   data_type: bigint
+    #   is_nullable: 'YES'
     start_epoch:
       data_type: bigint
       is_nullable: 'NO'
