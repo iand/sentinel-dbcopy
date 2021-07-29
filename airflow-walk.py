@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 def get_from_s3_for(epoc):
-    repos = [471050, 505660, 544858, 598300, 745340, 764950, 778800, 845164]
+    repos = [471050, 505660, 544858, 598300, 745340, 764950, 778800, 845164, 908400]
     for repo_epoc in repos:
         if repo_epoc > epoc:
             return f"s3://sentinel-backfill/repo/mainnet/{repo_epoc}"
