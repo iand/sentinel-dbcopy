@@ -36,7 +36,7 @@ if os.getenv("VISOR_LENS") == "lotusrepo":
         setup_rclone()
         subprocess.run("rm -rf /repo/*", shell=True, check=True)
         print(f"Fetching from sftp:snapshots/{folder}")
-        command = f"rclone copy sftp:snapshots/{folder}/lotus_datadir /repo"
+        command = f"rclone copy --ignore-checksum sftp:snapshots/{folder}/lotus_datadir /repo"
     subprocess.run(
         command,
         shell=True,
