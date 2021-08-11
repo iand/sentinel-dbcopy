@@ -13,12 +13,15 @@ if __name__ == "__main__":
     os.environ["AIRFLOW_INTERVAL"] = "DAILY"
     os.environ["JOB_NAME"] = "airflow-backfill-csvonly"
 
-    start = pendulum.parse("2020-09-18")
-    end = pendulum.parse("2021-06-30")
+    start = pendulum.parse("2020-08-24")
+    end = pendulum.parse("2021-07-28")
 
     for day in pendulum.period(start, end).range("days"):
         os.environ["AIRFLOW_TS"] = str(day)
         csv_path = get_output_folder()
         print(f"Running in {csv_path}")
         os.chdir(csv_path)
-        import_table(connect_str, table_name)
+        try:
+            import_table(connect_str, table_name)
+        except Exception:
+            pass
