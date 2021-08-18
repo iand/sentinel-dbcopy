@@ -106,11 +106,16 @@ def get_dt():
     return execution_time.format("YYYY-MM-DD")
 
 
+def get_epocs_foldername():
+    start_epoc, end_epoc = get_start_end_epocs()
+    return f"{start_epoc}__{end_epoc}"
+
+
 def get_output_folder():
     job_name = os.environ["JOB_NAME"]
     csv_base_path = os.getenv("CSV_BASE_PATH", "/output")
-    start_epoc, end_epoc = get_start_end_epocs()
-    return f"{csv_base_path}/{job_name}/{start_epoc}__{end_epoc}"
+    epocs_foldername = get_epocs_foldername()
+    return f"{csv_base_path}/{job_name}/{epocs_foldername}"
 
 
 tables = {
@@ -167,11 +172,11 @@ def import_table(connect_str, table_name):
     v1_columns = tables[table_name]
     if table_name in v1_tables:
         v1_columns = v1_tables[table_name]
-        csv_cut_comand = (
-            f"/usr/bin/csvcut -c {v0_columns} {v1_filename} > {v0_filename}"
-        )
-        print(csv_cut_comand, flush=True)
-        subprocess.run(csv_cut_comand, shell=True, check=True)
+        # csv_cut_comand = (
+        #     f"/usr/bin/csvcut -c {v0_columns} {v1_filename} > {v0_filename}"
+        # )
+        # print(csv_cut_comand, flush=True)
+        # subprocess.run(csv_cut_comand, shell=True, check=True)
 
     if os.getenv("VISOR_SCHEMA_VERSION") == "v0":
         import_filename = v0_filename
