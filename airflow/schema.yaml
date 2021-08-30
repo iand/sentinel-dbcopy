@@ -327,75 +327,75 @@ id_addresses:
   - id
   - address
   - state_root
-internal_messages:
-  columns:
-    actor_family:
-      data_type: text
-      is_nullable: 'NO'
-    actor_name:
-      data_type: text
-      is_nullable: 'NO'
-    cid:
-      data_type: text
-      is_nullable: 'NO'
-    exit_code:
-      data_type: bigint
-      is_nullable: 'NO'
-    from:
-      data_type: text
-      is_nullable: 'NO'
-    gas_used:
-      data_type: bigint
-      is_nullable: 'NO'
-    height:
-      data_type: bigint
-      is_nullable: 'NO'
-    method:
-      data_type: bigint
-      is_nullable: 'NO'
-    source_message:
-      data_type: text
-      is_nullable: 'YES'
-    state_root:
-      data_type: text
-      is_nullable: 'NO'
-    to:
-      data_type: text
-      is_nullable: 'NO'
-    value:
-      data_type: numeric
-      is_nullable: 'NO'
-  csv_header: ''
-  pkeys:
-  - height
-  - cid
-internal_parsed_messages:
-  columns:
-    cid:
-      data_type: text
-      is_nullable: 'NO'
-    from:
-      data_type: text
-      is_nullable: 'NO'
-    height:
-      data_type: bigint
-      is_nullable: 'NO'
-    method:
-      data_type: text
-      is_nullable: 'NO'
-    params:
-      data_type: jsonb
-      is_nullable: 'YES'
-    to:
-      data_type: text
-      is_nullable: 'NO'
-    value:
-      data_type: numeric
-      is_nullable: 'NO'
-  csv_header: ''
-  pkeys:
-  - height
-  - cid
+# internal_messages:
+#   columns:
+#     actor_family:
+#       data_type: text
+#       is_nullable: 'NO'
+#     actor_name:
+#       data_type: text
+#       is_nullable: 'NO'
+#     cid:
+#       data_type: text
+#       is_nullable: 'NO'
+#     exit_code:
+#       data_type: bigint
+#       is_nullable: 'NO'
+#     from:
+#       data_type: text
+#       is_nullable: 'NO'
+#     gas_used:
+#       data_type: bigint
+#       is_nullable: 'NO'
+#     height:
+#       data_type: bigint
+#       is_nullable: 'NO'
+#     method:
+#       data_type: bigint
+#       is_nullable: 'NO'
+#     source_message:
+#       data_type: text
+#       is_nullable: 'YES'
+#     state_root:
+#       data_type: text
+#       is_nullable: 'NO'
+#     to:
+#       data_type: text
+#       is_nullable: 'NO'
+#     value:
+#       data_type: numeric
+#       is_nullable: 'NO'
+#   csv_header: ''
+#   pkeys:
+#   - height
+#   - cid
+# internal_parsed_messages:
+#   columns:
+#     cid:
+#       data_type: text
+#       is_nullable: 'NO'
+#     from:
+#       data_type: text
+#       is_nullable: 'NO'
+#     height:
+#       data_type: bigint
+#       is_nullable: 'NO'
+#     method:
+#       data_type: text
+#       is_nullable: 'NO'
+#     params:
+#       data_type: jsonb
+#       is_nullable: 'YES'
+#     to:
+#       data_type: text
+#       is_nullable: 'NO'
+#     value:
+#       data_type: numeric
+#       is_nullable: 'NO'
+#   csv_header: ''
+#   pkeys:
+#   - height
+#   - cid
 market_deal_proposals:
   columns:
     client_collateral:
@@ -985,39 +985,39 @@ receipts:
   - height
   - message
   - state_root
-visor_processing_reports:
-  columns:
-    completed_at:
-      data_type: timestamp with time zone
-      is_nullable: 'NO'
-    errors_detected:
-      data_type: jsonb
-      is_nullable: 'YES'
-    height:
-      data_type: bigint
-      is_nullable: 'NO'
-    reporter:
-      data_type: text
-      is_nullable: 'NO'
-    started_at:
-      data_type: timestamp with time zone
-      is_nullable: 'NO'
-    state_root:
-      data_type: text
-      is_nullable: 'NO'
-    status:
-      data_type: text
-      is_nullable: 'YES'
-    status_information:
-      data_type: text
-      is_nullable: 'YES'
-    task:
-      data_type: text
-      is_nullable: 'NO'
-  csv_header: height,state_root,reporter,task,started_at,completed_at,status,status_information,errors_detected
-  pkeys:
-  - height
-  - state_root
-  - reporter
-  - task
-  - started_at
+# visor_processing_reports:
+#   columns:
+#     completed_at:
+#       data_type: timestamp with time zone
+#       is_nullable: 'NO'
+#     errors_detected:
+#       data_type: jsonb
+#       is_nullable: 'YES'
+#     height:
+#       data_type: bigint
+#       is_nullable: 'NO'
+#     reporter:
+#       data_type: text
+#       is_nullable: 'NO'
+#     started_at:
+#       data_type: timestamp with time zone
+#       is_nullable: 'NO'
+#     state_root:
+#       data_type: text
+#       is_nullable: 'NO'
+#     status:
+#       data_type: text
+#       is_nullable: 'YES'
+#     status_information:
+#       data_type: text
+#       is_nullable: 'YES'
+#     task:
+#       data_type: text
+#       is_nullable: 'NO'
+#   csv_header: height,state_root,reporter,task,started_at,completed_at,status,status_information,errors_detected
+#   pkeys:
+#   - height
+#   - state_root
+#   - reporter
+#   - task
+#   - started_at
