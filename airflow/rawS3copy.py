@@ -5,11 +5,6 @@ from helpers import get_output_folder, get_epocs_foldername
 import yaml
 
 
-file_path = pathlib.Path(__file__).parent.absolute()
-with open(file_path / "schema.yaml") as f:
-    schema = yaml.safe_load(f)
-
-
 if __name__ == "__main__":
     table_name = os.environ["SENTINEL_AIRFLOW_TABLENAME"]
     csv_path = get_output_folder()
