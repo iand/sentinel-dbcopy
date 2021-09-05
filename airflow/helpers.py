@@ -89,12 +89,12 @@ def get_execution_time():
 
 def get_start_end_epocs():
     execution_time = get_execution_time()
-    if os.getenv("AIRFLOW_INTERVAL") == "DAILY":
-        start_time = execution_time.start_of("day")
-        end_time = start_time.add(days=1)
-    else:
+    if os.getenv("AIRFLOW_INTERVAL") == "HOURLY":
         start_time = execution_time.subtract(hours=9)
         end_time = execution_time.subtract(hours=8)
+    else:
+        start_time = execution_time.start_of("day")
+        end_time = start_time.add(days=1)
 
     start_epoc = date_to_epoc(start_time)
     end_epoc = date_to_epoc(end_time)
